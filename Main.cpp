@@ -46,14 +46,14 @@ stats Bubble(std::vector<int>& data) //n^2
     stats bubble;
     for (size_t i = 0; i < data.size() - 1; i++)
         for (size_t j = 0; j < data.size() - i - 1; j++)
+        {
+            bubble.comparison_count++;
             if (data[j] > data[j + 1])
             {
-                int tmp = data[j];
-                data[j] = data[j + 1];
-                data[j + 1] = tmp;
-                bubble.comparison_count++;
+                swap(data[j], data[j + 1]);
                 bubble.copy_count++;
             }
+        }
     Print(data);
     return bubble;
 }
@@ -66,37 +66,56 @@ stats Shaker(std::vector<int>& data) //n^2
     int right = data.size() - 1;
     do {
         for (int i = left; i < right; i++)
+        {
+            shaker.comparison_count++;
             if (data[i] > data[i + 1])
             {
                 swap(data[i], data[i + 1]);
                 beyond = i;
+                shaker.copy_count++;
             }
+        }
         right = beyond;
         for (int i = right; i > left; i--)
+        {
+            shaker.comparison_count++;
             if (data[i] < data[i - 1])
             {
                 swap(data[i], data[i - 1]);
                 beyond = i;
+                shaker.copy_count++;
             }
+        }
         left = beyond;
+        shaker.comparison_count++;
     } while (left < right);
     Print(data);
     return shaker;
 }
 
-void Heap_Sort(std::vector<int>& data, size_t root, size_t size, stats& h)
+void Heap_Sort(std::vector<int>& data, size_t root, size_t size, stats& heap)
 {
-    size_t left = 2 * root + 1;
-    size_t right = 2 * root + 2;
     size_t largest = root;
-    //
+    size_t l = 2 * root + 1;
+    size_t r = 2 * root + 2;
+    heap.comparison_count++;
+    if ((l < size) && (data[l] > data[largest]))
+    {
+        largest = l;
+        heap.copy_count++;
+    }
+    heap.comparison_count++;
+    if ((r < size) && (data[r] > data[largest]))
+    {
+        largest = r;
+        heap.copy_count++;
+    }
+    heap.comparison_count++;
     if (largest != root)
     {
-        int tmp = data[root];
-        data[root] = data[largest];
-        data[largest] = tmp;
-        h.copy_count += 3;
-        Heap_Sort(data, largest, size, h);
+        swap(data[root], data[largest]);
+        heap.copy_count++;
+        Heap_Sort(data, largest, size, heap);
     }
 }
 
@@ -108,10 +127,8 @@ stats Heap(std::vector<int>& data) //n*log(n)
         Heap_Sort(data, i, size, heap);
     for (int i = size - 1; i > 0; i--)
     {
-        int tmp = data[0];
-        data[0] = data[i];
-        data[i] = tmp;
-        heap.copy_count += 3;
+        swap(data[i], data[0]);
+        heap.copy_count++;
         Heap_Sort(data, 0, i, heap);
     }
     Print(data);
